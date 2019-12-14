@@ -22,6 +22,10 @@ include_directories(
 
 add_library(LidarCompensation
    src/LidarCompensation.cc
+) 
+
+add_library(AuxiliarFunctions
+   src/AuxiliarFunctions.cc
 )
 
 target_link_libraries(LidarCompensation ${catkin_LIBRARIES} ${PCL_LIBRARIES})
@@ -30,7 +34,7 @@ add_dependencies(LidarCompensation ${catkin_EXPORTED_TARGETS})
 install(TARGETS LidarCompensation
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} 
 )
 
 install(FILES nodelets.xml LidarCompensation.launch
