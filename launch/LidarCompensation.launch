@@ -1,0 +1,127 @@
+<launch>
+
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen"/>
+
+  <!-- Run a passthrough filter to clean far points -->
+  <node pkg="nodelet" type="nodelet" name="passthrough_x" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="velodyne_points" />
+    <remap from="~output" to="/velodyne_points/filtered_x" />
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: -1
+      filter_limit_max: 10
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="passthrough_y" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="velodyne_points/filtered_x" />
+    <remap from="~output" to="/velodyne_points/filtered_xy" />
+    <rosparam>
+      filter_field_name: y
+      filter_limit_min: -5
+      filter_limit_max: 5
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <!-- Run a CropBox filter to clean car body points -->
+  <node pkg="nodelet" type="nodelet" name="cropbox_car" args="load pcl/CropBox pcl_manager" output="screen">
+    <remap from="~input" to="velodyne_points/filtered_xy" />
+    <remap from="~output" to="/velodyne_points/filtered_xy_car" />
+    <rosparam>
+      min_x: -3
+      max_x: 1
+      min_y: -1
+      max_y: 1
+      negative: True
+    </rosparam>
+  </node>
+
+  <!-- Run a VoxelGrid filter: downsample the data -->
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/velodyne_points/filtered_xy_car" />
+    <remap from="~output" to="/velodyne_points/voxelgrid" />
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: -2.0
+      filter_limit_max: 15.0
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+  </node>
+
+  <!-- Segment the ground plane -->
+  <node pkg="nodelet" type="nodelet" name="planar_segmentation" args="load pcl/SACSegmentation pcl_manager" output="screen">
+    <remap from="~input"   to="/velodyne_points/voxelgrid" />
+    <rosparam>
+      # -[ Mandatory parameters
+      # model_type:
+      # 0: SACMODEL_PLANE
+      # 1: SACMODEL_LINE
+      # 2: SACMODEL_CIRCLE2D
+      # 3: SACMODEL_CIRCLE3D
+      # 4: SACMODEL_SPHERE
+      # 5: SACMODEL_CYLINDER
+      # 6: SACMODEL_CONE
+      # 7: SACMODEL_TORUS
+      # 8: SACMODEL_PARALLEL_LINE
+      # 9: SACMODEL_PERPENDICULAR_PLANE
+      # 10: SACMODEL_PARALLEL_LINES
+      # 11: SACMODEL_NORMAL_PLANE
+      # 12: SACMODEL_NORMAL_SPHERE
+      # 13: SACMODEL_REGISTRATION
+      # 14: SACMODEL_REGISTRATION_2D
+      # 15: SACMODEL_PARALLEL_PLANE
+      # 16: SACMODEL_NORMAL_PARALLEL_PLANE
+      # 17: SACMODEL_STICK
+      model_type: 0
+      distance_threshold: 0.1
+      max_iterations: 1000
+      method_type: 0
+      optimize_coefficients: true
+      normal_distance_weight: 0.1
+      eps_angle: 0.09
+    </rosparam>
+  </node>
+
+
+  <node pkg="nodelet" type="nodelet" name="extract_plane" args="load pcl/ExtractIndices pcl_manager" output="screen">
+    <remap from="~input"   to="/velodyne_points/voxelgrid" />
+    <remap from="~indices" to="/planar_segmentation/inliers" />
+    <remap from="~output" to="/velodyne_points/filtered_final" />
+    <rosparam>
+      negative: true
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="only_plane" args="load pcl/ExtractIndices pcl_manager" output="screen">
+    <remap from="~input"   to="/velodyne_points/voxelgrid" />
+    <remap from="~indices" to="/planar_segmentation/inliers" />
+    <remap from="~output" to="/velodyne_points/plane" />
+    <rosparam>
+      negative: false
+    </rosparam>
+  </node>
+
+  <!-- VoxelGrid filter X: downsample for fusion -->
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_fusion_x" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/velodyne_points/filtered_final" />
+    <remap from="~output" to="/velodyne_points/filtered_fusion_final" />
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: -2.0
+      filter_limit_max: 15.0
+      filter_limit_negative: False
+      leaf_size: 0.1
+    </rosparam>
+  </node>
+
+  <!-- Execute C++ code with the cluster extraction -->
+  <node pkg="nodelet"
+        type="nodelet"
+        name="LidarCompensation"
+        args="load LidarCompensation pcl_manager">
+  </node>
+
+</launch>
