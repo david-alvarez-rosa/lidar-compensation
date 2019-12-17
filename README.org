@@ -1,4 +1,6 @@
-* LiDAR Compensation
+# -*- ispell-dictionary: "english" -*-
+
+
 #+AUTHOR: David Álvarez Rosa
 #+EMAIL: david@alvarezrosa.com
 #+STARTUP: showall
