@@ -117,13 +117,13 @@ there may be points such that the detection time differs by *0.1s* (i.e. a
 period). Therefore, by this time the car will have moved (and the =LiDAR= with
 it) *2.5m* (0.1s * 25m/s). This is the actual (maximum) distortion.
 
-*** Get velocity from IMU
+*** Get velocity from IMU 🌪
 We get the (linear) velocity of the car at that moment from a =IMU=.
 #+BEGIN_SRC c++
   geometry_msgs::Vector3 velocity = odom->twist.twist.linear;
 #+END_SRC
 
-*** First angle of vision
+*** First angle of vision 📐
 Obviously, there is not such a thing like the distortion of a complete
 =PointCloud=, since it will be different for each point. This distortion
 depends on the time between the recording of the first point and the current
@@ -137,7 +137,7 @@ The first angle of vision *θ₀* is computed as follows:
   float theta0 = atan(-point0.y, point0.x);
 #+END_SRC
 
-*** Actual compensation
+*** Actual compensation 📝
 For compensating a =PointCloud= we iterate on points and for each point we do
 the following.
 
@@ -166,23 +166,33 @@ We will know present some examples of the compensation code in operation. In all
 the examples below the linear velocity of the car is shown in the open terminal
 in the top left corner (in km/h). The =LiDAR= frequency in all this examples is
 fixed and set to *10Hz*. In the images are shown both the non-compensated filter
-=PointCloud= as _colored_ points and the compensated in _white_.
+=PointCloud= and the compensated:
++ _Non-compensated_: *colored* points.
++ _Compensated_: *white* points.
 
-*** Acceleration
-This is an (straight) acceleration test at a moderate speed (around 35 km/h).
-#+HTML: <img src="img2/1. Acceleration.png" width="100%" />
+*** Acceleration ⬆
+This is an (straight) acceleration test at a moderate speed (around *35km/h*).
+#+HTML: <img src="imgs/1. Acceleration.png" width="100%" />
 As you can see the compensation works as expected. The cones are being "pushed
 back" always (as it should be) and cones pairs line up.
-*** Faster acceleration
-Here is another example of an (straight) acceleration test at a higher speed and
-with a larger field of vision.
-#+HTML: <img2 src="img2/2. Faster acceleration.png" width="100%" />
+*** Faster acceleration ⬆
+Here is another example of an (straight) acceleration test at a higher speed
+(around *75km/h*) and with a larger field of vision.
+#+HTML: <img src="imgs/2. Faster acceleration.png" width="100%" />
 One thing to note is that the first left cone is "alone" because the distortion
 is large enough not to see it's partner.
-*** Lateral compensation in acceleration
-
-#+HTML: <img2 src="img2/3. Lateral compensation in acceleration.png" width="100%" />
-*** No compensation - Slow speed
-#+HTML: <img2 src="img2/4. No compensation - Slow speed.png" width="100%" />
-*** Curved road
-#+HTML: <img2 src="img2/5. Curved road.png" width="100%" />
+*** Lateral compensation in acceleration ↗
+This is also another example of an (straight) acceleration test, but in this
+case the car is not centered on the track and it's turning right to center
+it.
+#+HTML: <img src="imgs/3. Lateral compensation in acceleration.png" width="100%" />
+We can see here the lateral compensation (more accentuated in the cones on
+the right).
+*** No compensation - Slow speed 🐌
+Here is an example in which the car is going at a slow speed (around
+*4km/h*).
+#+HTML: <img src="imgs/4. No compensation - Slow speed.png" width="100%" />
+As we can see there is no appreciable compensation, as expected.
+*** Curved road 🔄
+Finally, an example of compensation on a curved road.
+#+HTML: <img src="imgs/5. Curved road.png" width="100%" />
