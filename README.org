@@ -1,2 +1,99 @@
 * LiDAR Compensation
+#+AUTHOR: David Álvarez Rosa
+#+EMAIL: david@alvarezrosa.com
+#+STARTUP: showall
+
+
+* LiDAR Compensation 🚨
+
 This repository contains the source code of the LiDAR Compensation.
+
+
+** Getting Started 🚀
+These instructions will get you a copy of the project up and running on your
+local machine for development and testing purposes.
+
+*** Prerequisites 📋
+Robot Operating System (=ROS=) needs to be installed [[http://wiki.ros.org/kinetic/Installation/Ubuntu][link]] and a =rosbag= with
+raw data is needed.
+#+BEGIN_SRC bash
+  ros-kinetic-desktop-full
+#+END_SRC
+
+*** Installing 🔧
+The folders given are =ROS= packages that need to be inside your workspace
+following this structure:
+#+BEGIN_SRC text
+  your-ws
+    build
+    devel
+    src
+      lidar_processing
+         dv_perception_pointcloud
+         lidar_nn
+         perception_msg
+         ...
+#+END_SRC
+
+Then, the steps are:
+
+*Create workspace and src folder*
+#+BEGIN_SRC bash
+  mkdir your-ws
+  cd your-ws
+  mkdir src
+  catkin_make
+#+END_SRC
+
+*Clone the repository inside src*
+#+BEGIN_SRC bash
+  cd src
+  git clone git@serv-driverless-33:arnau.roche/lidar_processing.git # TODO: change this.
+#+END_SRC
+
+*Compile the code (it may take some time the first time)*
+#+BEGIN_SRC bash
+  cd ..
+  catkin_make
+#+END_SRC
+
+
+** Running the algorithm with raw data ⚙️
+*Launch the nodelet*
+#+BEGIN_SRC bash
+  source devel/setup.bash
+  roslaunch dv_perception_pointcloud lidar_nodelet.launch
+#+END_SRC
+
+Then, the =nodelet= is waiting for the input data.
+
+*Play the rosbag:*
+#+BEGIN_SRC bash
+  cd <folder_with_rosbags>
+  rosrun rqt_bag rqt_bag rosbag_name.bag
+#+END_SRC
+and publish the =velodyne_points= topic.
+or
+#+BEGIN_SRC bash
+  cd <folder_with_rosbags>
+  rosbag play rosbag_name.bag --loop
+#+END_SRC
+and all the topics in the =rosbags= will be published.
+The =nodelet= should start computing and printing results.
+
+*** Visualization 🔮
+Use =RVIZ= to visualize the point cloud and the markers published with the cones
+detected:
+#+BEGIN_SRC bash
+  rviz &
+#+END_SRC
+and add type of data =PointCloud2= and =MarkerArray=.
+
+
+** Difficulties 🛠
+Ask a Perception member ;)
+
+
+** Authors ✒️
+Arnau Roche López
+
