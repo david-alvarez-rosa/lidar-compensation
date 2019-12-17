@@ -8,7 +8,7 @@
 
 * LiDAR Compensation 🚨
 
-This repository contains the source code of the LiDAR Compensation.
+This repository contains the source code of the =LiDAR= Compensation.
 
 
 ** Getting Started 🚀
@@ -100,7 +100,7 @@ Ask a Perception member ;)
 Arnau Roche López
 
 
-** Explanation of the code 💡
+** Understanding the code 💡
 The main purpose of this code is to compensate the distortion that appears in
 the data received from the =LiDAR= due to the movement of the car. This happens
 because the =LiDAR= takes non-zero time for completing a turn. Therefore, since
@@ -117,6 +117,12 @@ there may be points such that the detection time differs by *0.1s* (i.e. a
 period). Therefore, by this time the car will have moved (and the =LiDAR= with
 it) *2.5m* (0.1s * 25m/s). This is the actual (maximum) distortion.
 
+*** Get velocity from IMU
+We get the (linear) velocity of the car at that moment from a =IMU=.
+#+BEGIN_SRC c++
+  geometry_msgs::Vector3 velocity = odom->twist.twist.linear;
+#+END_SRC
+
 *** First angle of vision
 Obviously, there is not such a thing like the distortion of a complete
 =PointCloud=, since it will be different for each point. This distortion
@@ -132,30 +138,51 @@ The first angle of vision *θ₀* is computed as follows:
 #+END_SRC
 
 *** Actual compensation
+For compensating a =PointCloud= we iterate on points and for each point we do
+the following.
+
++ Compute it's angle *θ*: same as previous section computation.
++ Compute the differences in angles (known *θ* and *θ₀*):
+#+BEGIN_SRC c++
+  float deltaTheta = theta0 - theta;
+    if (deltaTheta < 0)
+      deltaTheta += 2 * M_PI;
+#+END_SRC
++ Compute elapsed time (known the =LiDAR= frequency and the difference between
+  angles):
+#+BEGIN_SRC c++
+  float time = deltaTheta / ( 2 * M_PI * FREQUENCY );
+#+END_SRC
++ Compensate point (known elapsed time and linear velocity of the car):
+#+BEGIN_SRC c++
+  point.x += time * velocity.x;
+  point.y += time * velocity.y;
+  point.z += time * velocity.z;
+#+END_SRC
 
 
 ** Results 🎯
-*** Screenshots
-**** Acceleration
+We will know present some examples of the compensation code in operation. In all
+the examples below the linear velocity of the car is shown in the open terminal
+in the top left corner (in km/h). The =LiDAR= frequency in all this examples is
+fixed and set to *10Hz*. In the images are shown both the non-compensated filter
+=PointCloud= as _colored_ points and the compensated in _white_.
+
+*** Acceleration
+This is an (straight) acceleration test at a moderate speed (around 35 km/h).
 #+HTML: <img src="img/1. Acceleration.png" width="100%" />
-**** Faster acceleration
+As you can see the compensation works as expected. The cones are being "pushed
+back" always (as it should be) and cones pairs line up.
+*** Faster acceleration
+Here is another example of an (straight) acceleration test at a higher speed and
+with a larger field of vision.
 #+HTML: <img src="img/2. Faster acceleration.png" width="100%" />
-**** Lateral compensation in acceleration
+One thing to note is that the first left cone is "alone" because the distortion
+is large enough not to see it's partner.
+*** Lateral compensation in acceleration
+
 #+HTML: <img src="img/3. Lateral compensation in acceleration.png" width="100%" />
-**** No compensation - Slow speed
+*** No compensation - Slow speed
 #+HTML: <img src="img/4. No compensation - Slow speed.png" width="100%" />
-**** Curved road
+*** Curved road
 #+HTML: <img src="img/5. Curved road.png" width="100%" />
-
-
-
-
-
-
-
-
-
-
-
-
-#+HTML: </div>
