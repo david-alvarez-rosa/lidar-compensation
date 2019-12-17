@@ -170,19 +170,19 @@ fixed and set to *10Hz*. In the images are shown both the non-compensated filter
 
 *** Acceleration
 This is an (straight) acceleration test at a moderate speed (around 35 km/h).
-#+HTML: <img src="img/1. Acceleration.png" width="100%" />
+#+HTML: <img src="img2/1. Acceleration.png" width="100%" />
 As you can see the compensation works as expected. The cones are being "pushed
 back" always (as it should be) and cones pairs line up.
 *** Faster acceleration
 Here is another example of an (straight) acceleration test at a higher speed and
 with a larger field of vision.
-#+HTML: <img src="img/2. Faster acceleration.png" width="100%" />
+#+HTML: <img2 src="img2/2. Faster acceleration.png" width="100%" />
 One thing to note is that the first left cone is "alone" because the distortion
 is large enough not to see it's partner.
 *** Lateral compensation in acceleration
 
-#+HTML: <img src="img/3. Lateral compensation in acceleration.png" width="100%" />
+#+HTML: <img2 src="img2/3. Lateral compensation in acceleration.png" width="100%" />
 *** No compensation - Slow speed
-#+HTML: <img src="img/4. No compensation - Slow speed.png" width="100%" />
+#+HTML: <img2 src="img2/4. No compensation - Slow speed.png" width="100%" />
 *** Curved road
-#+HTML: <img src="img/5. Curved road.png" width="100%" />
+#+HTML: <img2 src="img2/5. Curved road.png" width="100%" />
