@@ -24,9 +24,6 @@
 // Messages.
 #include <nav_msgs/Odometry.h>
 
-// Auxiliar functions.
-#include "AuxiliarFunctions.hh"
-
 
 class LidarCompensation : public nodelet::Nodelet{
 public:
