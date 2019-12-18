@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sincro_xyz</name>
+  <name>lidar-compensation</name>
   <version>1.0.0</version>
   <description>The dv_perception_pointcloud package</description>
 
