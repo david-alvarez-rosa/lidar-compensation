@@ -38,6 +38,10 @@ public:
   void callback(const sensor_msgs::PointCloud2ConstPtr&, 
                 const sensor_msgs::PointCloud2ConstPtr&, 
                 const nav_msgs::OdometryConstPtr&);
+
+private:
+  // Compute angle given x and y in [0, 2*PI] range.
+  float atan(float x, float y);
 };
 
 
