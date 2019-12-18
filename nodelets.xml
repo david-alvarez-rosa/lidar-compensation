@@ -2,6 +2,7 @@
   <class name="LidarCompensation"
          type="LidarCompensation"
          base_class_type="nodelet::Nodelet">
-    <description>This is a lidar nodelet</description>
+    <description>This is the LiDAR Compensation nodelet.</description>
   </class>
 </library>
+

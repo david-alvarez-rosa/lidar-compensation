@@ -1,22 +1,6 @@
 #include "LidarCompensation.hh"
 
 
-
-
-float atan(float x, float y) {
-  float theta = std::atan(y/x);
-  if (x >= 0 and y >= 0)
-    return theta;
-  if (x >= 0 and y < 0)
-    return theta + 2*M_PI;
-  return theta + M_PI;
-}
-
-
-
-
-
-
 const int FREQUENCY = 10; // LiDAR frequency (in Hz);
 
 
@@ -28,7 +12,6 @@ LidarCompensation::LidarCompensation() {
 LidarCompensation::~LidarCompensation() {
   std::cout << "LidarCompensation is being deleted." << std::endl;
 }
-
 
 
 void LidarCompensation::onInit(void){
@@ -54,10 +37,7 @@ void LidarCompensation::callback(const sensor_msgs::PointCloud2ConstPtr& rawClou
   // Get linear velocity from /vectornav/Odom.
   geometry_msgs::Vector3 velocity = odom->twist.twist.linear;
 
-  std::cout << "v_x= " << velocity.x * 3.6 << "\t"
-            << "v_y= " << velocity.y * 3.6 << "\t"
-            << "v_z= " << velocity.z * 3.6 << "\t" << std::endl;
-
+  // Change format of PointCloud received from LiDAR.
   pcl::fromROSMsg(*rawCloudFiltered, cloudFiltered);
   pcl::fromROSMsg(*rawCloud, cloud);
 
@@ -88,4 +68,14 @@ void LidarCompensation::callback(const sensor_msgs::PointCloud2ConstPtr& rawClou
   }
 
   cloudCompensatedPublisher.publish(cloudCompensated);
+}
+
+
+float LidarCompensation::atan(float x, float y) {
+  float theta = std::atan(y/x);
+  if (x >= 0 and y >= 0)
+    return theta;
+  if (x >= 0 and y < 0)
+    return theta + 2*M_PI;
+  return theta + M_PI;
 }

@@ -1,5 +1,4 @@
 <launch>
-
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen"/>
 
   <!-- Run a passthrough filter to clean far points -->
@@ -123,5 +122,4 @@
         name="LidarCompensation"
         args="load LidarCompensation pcl_manager">
   </node>
-
 </launch>
