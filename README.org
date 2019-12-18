@@ -16,7 +16,7 @@ These instructions will get you a copy of the project up and running on your
 local machine for development and testing purposes.
 
 *** Prerequisites 📋
-Robot Operating System (=ROS=) needs to be installed [[http://wiki.ros.org/kinetic/Installation/Ubuntu][link]] and a =rosbag= with
+Robot Operating System (=ROS=) needs to be installed ([[http://wiki.ros.org/kinetic/Installation/Ubuntu][link]]) and a =rosbag= with
 raw data is needed.
 #+BEGIN_SRC bash
   ros-kinetic-desktop-full
@@ -30,10 +30,10 @@ following this structure:
     build
     devel
     src
-      lidar_processing
-         dv_perception_pointcloud
-         lidar_nn
-         perception_msg
+      lidar-compensation
+         imgs
+         include
+         launch
          ...
 #+END_SRC
 
@@ -50,7 +50,7 @@ Then, the steps are:
 *Clone the repository inside src*
 #+BEGIN_SRC bash
   cd src
-  git clone git@serv-driverless-33:arnau.roche/lidar_processing.git # TODO: change this.
+  git clone git@serv-driverless-33:david.alvarez/lidar-compensation.git
 #+END_SRC
 
 *Compile the code (it may take some time the first time)*
@@ -64,7 +64,7 @@ Then, the steps are:
 *Launch the nodelet*
 #+BEGIN_SRC bash
   source devel/setup.bash
-  roslaunch dv_perception_pointcloud lidar_nodelet.launch
+  roslaunch lidar-compensation LidarCompensation.launch
 #+END_SRC
 
 Then, the =nodelet= is waiting for the input data.
@@ -75,6 +75,7 @@ Then, the =nodelet= is waiting for the input data.
   rosrun rqt_bag rqt_bag rosbag_name.bag
 #+END_SRC
 and publish the =velodyne_points= topic.
+
 or
 #+BEGIN_SRC bash
   cd <folder_with_rosbags>
@@ -90,14 +91,6 @@ detected:
   rviz &
 #+END_SRC
 and add type of data =PointCloud2= and =MarkerArray=.
-
-
-** Difficulties 🛠
-Ask a Perception member ;)
-
-
-** Authors ✒️
-Arnau Roche López
 
 
 ** Understanding the code 💡
@@ -196,3 +189,11 @@ As we can see there is no appreciable compensation, as expected.
 *** Curved road 🔄
 Finally, an example of compensation on a curved road.
 #+HTML: <img src="imgs/5. Curved road.png" width="100%" />
+
+
+** Difficulties 🛠
+Ask a Perception member ;)
+
+
+** Authors ✒️
+David Álvarez Rosa
