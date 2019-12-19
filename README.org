@@ -60,7 +60,7 @@ Then, the steps are:
 #+END_SRC
 
 
-** Running the algorithm with raw data ⚙️
+** Running the algorithm with raw data ️
 *Launch the nodelet*
 #+BEGIN_SRC bash
   source devel/setup.bash
@@ -116,18 +116,21 @@ We get the (linear) velocity of the car at that moment from a =IMU=.
   geometry_msgs::Vector3 velocity = odom->twist.twist.linear;
 #+END_SRC
 
-*** First angle of vision 📐
+*** Last angle of vision 📐
 Obviously, there is not such a thing like the distortion of a complete
 =PointCloud=, since it will be different for each point. This distortion
-depends on the time between the recording of the first point and the current
+depends on the time between the recording of the last point and the current
 one. This elapsed time is proportional to the difference of angles between
 points, therefore we will work with angles since they can be more easily
 computed.
 
-The first angle of vision *θ₀* is computed as follows:
+We need to work with the last angle, and not with first angle because the LiDAR
+assign the =time stamp= of this last point to the whole =PointCloud=.
+
+The last angle of vision *θEnd* is computed as follows:
 #+BEGIN_SRC c++
-  pcl::PointXYZ& point0 = cloud.points[0];
-  float theta0 = atan(-point0.y, point0.x);
+  pcl::PointXYZ& pointEnd = cloud.points[cloud.points.size() - 1];
+  float thetaEnd = atan(-pointEnd.y, pointEnd.x);
 #+END_SRC
 
 *** Actual compensation 📝
@@ -135,9 +138,9 @@ For compensating a =PointCloud= we iterate on points and for each point we do
 the following.
 
 + Compute it's angle *θ*: same as previous section computation.
-+ Compute the differences in angles (known *θ* and *θ₀*):
++ Compute the differences in angles (known *θ* and *θEnd*):
 #+BEGIN_SRC c++
-  float deltaTheta = theta0 - theta;
+  float deltaTheta = theta - thetaEnd;
     if (deltaTheta < 0)
       deltaTheta += 2 * M_PI;
 #+END_SRC
@@ -148,9 +151,9 @@ the following.
 #+END_SRC
 + Compensate point (known elapsed time and linear velocity of the car):
 #+BEGIN_SRC c++
-  point.x += time * velocity.x;
-  point.y += time * velocity.y;
-  point.z += time * velocity.z;
+  point.x -= time * velocity.x;
+  point.y -= time * velocity.y;
+  point.z -= time * velocity.z;
 #+END_SRC
 
 
@@ -167,7 +170,7 @@ fixed and set to *10Hz*. In the images are shown both the non-compensated filter
 This is an (straight) acceleration test at a moderate speed (around *35km/h*).
 #+HTML: <img src="imgs/1. Acceleration.png" width="100%" />
 As you can see the compensation works as expected. The cones are being "pushed
-back" always (as it should be) and cones pairs line up.
+forward" always (as it should be) and cones pairs line up.
 *** Faster acceleration ⬆
 Here is another example of an (straight) acceleration test at a higher speed
 (around *75km/h*) and with a larger field of vision.
@@ -180,7 +183,7 @@ case the car is not centered on the track and it's turning right to center
 it.
 #+HTML: <img src="imgs/3. Lateral compensation in acceleration.png" width="100%" />
 We can see here the lateral compensation (more accentuated in the cones on
-the right).
+the left).
 *** No compensation - Slow speed 🐌
 Here is an example in which the car is going at a slow speed (around
 *4km/h*).
