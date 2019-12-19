@@ -25,7 +25,7 @@ void LidarCompensation::onInit(void){
   message_filters::Synchronizer<syncPolicy> sync(syncPolicy(10), sub1, sub2, sub3);
   sync.registerCallback(boost::bind(&LidarCompensation::callback, this, _1, _2, _3));
 
-  cloudCompensatedPublisher = nh.advertise<pcl::PointCloud<pcl::PointXYZ>>("/lidar/cloudCompensated", 2);
+  cloudCompensatedPublisher = nh.advertise<sensor_msgs::PointCloud2>("/lidar/cloudCompensated", 2);
 
   ros::spin();
 }
@@ -67,7 +67,11 @@ void LidarCompensation::callback(const sensor_msgs::PointCloud2ConstPtr& rawClou
     point.z += time * velocity.z;
   }
 
-  cloudCompensatedPublisher.publish(cloudCompensated);
+  sensor_msgs::PointCloud2 cloud_msg;
+  pcl::toROSMsg(cloudCompensated, cloud_msg);
+  cloud_msg.header = rawCloud->header;
+  cloudCompensatedPublisher.publish(cloud_msg);
+  ros::spinOnce();
 }
 
 

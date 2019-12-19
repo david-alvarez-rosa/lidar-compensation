@@ -27,10 +27,6 @@
 
 class LidarCompensation : public nodelet::Nodelet{
 public:
-  ros::Publisher cloudCompensatedPublisher;
-  pcl::PointCloud<pcl::PointXYZ> cloudFiltered;
-  pcl::PointCloud<pcl::PointXYZ> cloud;
-
   LidarCompensation();
   ~LidarCompensation();
 
@@ -40,6 +36,10 @@ public:
                 const nav_msgs::OdometryConstPtr&);
 
 private:
+  ros::Publisher cloudCompensatedPublisher;
+  pcl::PointCloud<pcl::PointXYZ> cloudFiltered;
+  pcl::PointCloud<pcl::PointXYZ> cloud;
+ 
   // Compute angle given x and y in [0, 2*PI] range.
   float atan(float x, float y);
 };
