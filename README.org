@@ -193,6 +193,11 @@ As we can see there is no appreciable compensation, as expected.
 Finally, an example of compensation on a curved road.
 #+HTML: <img src="imgs/5. Curved road.png" width="100%" />
 
+*** Non deformed shapes 💎
+As a last detail, we show a side view of the =PointCloud= where we can see that
+the shapes are not being deformed while compensating.
+#+HTML: <img src="imgs/6. Non deformed shapes.png" width="100%" />
+
 
 ** Difficulties 🛠
 Ask a Perception member ;)
