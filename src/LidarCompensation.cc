@@ -25,7 +25,7 @@ void LidarCompensation::onInit(void){
   message_filters::Synchronizer<syncPolicy> sync(syncPolicy(10), sub1, sub2, sub3);
   sync.registerCallback(boost::bind(&LidarCompensation::callback, this, _1, _2, _3));
 
-  cloudCompensatedPublisher = nh.advertise<pcl::PointCloud<pcl::PointXYZ>>("/lidar/cloudCompensated", 2);
+  cloudCompensatedPublisher = nh.advertise<sensor_msgs::PointCloud2>("/lidar/cloudCompensated", 2);
 
   ros::spin();
 }
@@ -50,24 +50,29 @@ void LidarCompensation::callback(const sensor_msgs::PointCloud2ConstPtr& rawClou
     return;
   }
 
-  pcl::PointXYZ& point0 = cloud.points[0];
-  float theta0 = atan(-point0.y, point0.x);
-  for (int i = 1; i < int(cloudCompensated.points.size()); ++i) {
+  pcl::PointXYZ& pointEnd = cloud.points[cloud.points.size() - 1];
+  float thetaEnd = atan(-pointEnd.y, pointEnd.x);
+
+  for (int i = 0; i < int(cloudCompensated.points.size()) - 1; ++i) {
     // Compensate positions.
     pcl::PointXYZ& point = cloudCompensated.points[i];
     float theta = atan(-point.y, point.x);
-    float deltaTheta = theta0 - theta;
+    float deltaTheta = theta - thetaEnd;
 
     if (deltaTheta < 0)
       deltaTheta += 2 * M_PI;
     float time = deltaTheta / ( 2 * M_PI * FREQUENCY );
 
-    point.x += time * velocity.x;
-    point.y += time * velocity.y;
-    point.z += time * velocity.z;
+    point.x -= time * velocity.x;
+    point.y -= time * velocity.y;
+    point.z -= time * velocity.z;
   }
 
-  cloudCompensatedPublisher.publish(cloudCompensated);
+  sensor_msgs::PointCloud2 cloudMsg;
+  pcl::toROSMsg(cloudCompensated, cloudMsg);
+  cloudMsg.header = rawCloud->header;
+  cloudCompensatedPublisher.publish(cloudMsg);
+  ros::spinOnce();
 }
 
 
