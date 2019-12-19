@@ -5,12 +5,12 @@ const int FREQUENCY = 10; // LiDAR frequency (in Hz);
 
 
 LidarCompensation::LidarCompensation() {
-  std::cout << "LidarCompensation is being created." << std::endl;
+  ROS_INFO("LidarCompensation class is being created.");
 }
 
 
 LidarCompensation::~LidarCompensation() {
-  std::cout << "LidarCompensation is being deleted." << std::endl;
+  ROS_INFO("LidarCompensation class is being deleted.");
 }
 
 

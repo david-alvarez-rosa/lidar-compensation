@@ -2,8 +2,6 @@
 #define LIDARCOMPENSATION_HH
 
 
-#include <iostream> // TODO: get rid of this.
-
 // Ros.
 #include <ros/ros.h>
 
