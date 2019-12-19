@@ -56,15 +56,15 @@ void LidarCompensation::callback(const sensor_msgs::PointCloud2ConstPtr& rawClou
     // Compensate positions.
     pcl::PointXYZ& point = cloudCompensated.points[i];
     float theta = atan(-point.y, point.x);
-    float deltaTheta = theta0 - theta;
+    float deltaTheta = theta - theta0;
 
     if (deltaTheta < 0)
       deltaTheta += 2 * M_PI;
     float time = deltaTheta / ( 2 * M_PI * FREQUENCY );
 
-    point.x += time * velocity.x;
-    point.y += time * velocity.y;
-    point.z += time * velocity.z;
+    point.x -= time * velocity.x;
+    point.y -= time * velocity.y;
+    point.z -= time * velocity.z;
   }
 
   sensor_msgs::PointCloud2 cloud_msg;
